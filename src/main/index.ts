@@ -24,8 +24,13 @@ function fatal(context: string, error: unknown): never {
   throw error
 }
 
-process.on('uncaughtException', (error) => fatal('uncaught exception', error))
-process.on('unhandledRejection', (reason) => fatal('unhandled rejection', reason))
+// Rejection handler for promises whose caller cannot await them.
+function onFailure(context: string): (error: unknown) => never {
+  return (error) => fatal(context, error)
+}
+
+process.on('uncaughtException', onFailure('uncaught exception'))
+process.on('unhandledRejection', onFailure('unhandled rejection'))
 
 // Prototype keeps its data inside the project, not in the user profile.
 // Production would use app.getPath('userData').
@@ -98,7 +103,7 @@ function createWindow(): void {
   mainWindow.on('close', (event) => {
     if (isQuitting) return
     event.preventDefault()
-    hideWindow().catch((error) => fatal('hide on close', error))
+    hideWindow().catch(onFailure('hide on close'))
   })
 
   mainWindow.on('closed', () => {
@@ -106,7 +111,7 @@ function createWindow(): void {
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url).catch((error) => fatal('open external link', error))
+    shell.openExternal(details.url).catch(onFailure('open external link'))
     return { action: 'deny' }
   })
 
@@ -117,11 +122,11 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow
       .loadURL(process.env['ELECTRON_RENDERER_URL'])
-      .catch((error) => fatal('load renderer URL', error))
+      .catch(onFailure('load renderer URL'))
   } else {
     mainWindow
       .loadFile(join(__dirname, '../renderer/index.html'))
-      .catch((error) => fatal('load renderer file', error))
+      .catch(onFailure('load renderer file'))
   }
 }
 
@@ -191,7 +196,7 @@ function toggleWindow(): void {
   const win = liveWindow()
   if (!win) return
   if (win.isVisible() && win.isFocused()) {
-    hideWindow().catch((error) => fatal('hide window', error))
+    hideWindow().catch(onFailure('hide window'))
   } else {
     showWindow()
   }
@@ -244,7 +249,7 @@ app
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
   })
-  .catch((error) => fatal('startup', error))
+  .catch(onFailure('startup'))
 
 app.on('before-quit', () => {
   isQuitting = true

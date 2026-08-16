@@ -46,11 +46,16 @@ function App(): React.JSX.Element {
       }
     }
 
+    // Fire-and-report: the caller does not await, but nothing is discarded.
+    const saveNow = (): void => {
+      save().catch((error) => setSaveError(describe(error)))
+    }
+
     const scheduleSave = (): void => {
       clearTimer()
       timer = setTimeout(() => {
         timer = null
-        save().catch((error) => setSaveError(describe(error)))
+        saveNow()
       }, SAVE_DEBOUNCE_MS)
     }
 
@@ -70,9 +75,7 @@ function App(): React.JSX.Element {
       view?.focus()
     })
 
-    const onBlur = (): void => {
-      save().catch((error) => setSaveError(describe(error)))
-    }
+    const onBlur = (): void => saveNow()
     window.addEventListener('blur', onBlur)
 
     window.api
@@ -96,7 +99,7 @@ function App(): React.JSX.Element {
                 {
                   key: 'Mod-s',
                   run: () => {
-                    save().catch((error) => setSaveError(describe(error)))
+                    saveNow()
                     return true
                   }
                 }
