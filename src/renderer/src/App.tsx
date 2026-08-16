@@ -50,21 +50,29 @@ function App(): React.JSX.Element {
       clearTimer()
       timer = setTimeout(() => {
         timer = null
-        void save()
+        save().catch((error) => setSaveError(describe(error)))
       }, SAVE_DEBOUNCE_MS)
     }
 
     // Main hides the window only if this reports success, so a failed save
     // keeps the window on screen instead of losing the text.
     const offFlush = window.api.onFlushRequest(() => {
-      void save().then((message) => window.api.reportFlushed(message === null, message ?? undefined))
+      save()
+        .then((message) => window.api.reportFlushed(message === null, message ?? undefined))
+        .catch((error) => {
+          // Main is waiting on this reply; staying silent would strand it until
+          // the timeout and hide the window on a stale verdict.
+          window.api.reportFlushed(false, describe(error))
+        })
     })
 
     const offFocus = window.api.onFocusRequest(() => {
       view?.focus()
     })
 
-    const onBlur = (): void => void save()
+    const onBlur = (): void => {
+      save().catch((error) => setSaveError(describe(error)))
+    }
     window.addEventListener('blur', onBlur)
 
     window.api
@@ -88,7 +96,7 @@ function App(): React.JSX.Element {
                 {
                   key: 'Mod-s',
                   run: () => {
-                    void save()
+                    save().catch((error) => setSaveError(describe(error)))
                     return true
                   }
                 }

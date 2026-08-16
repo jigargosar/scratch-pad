@@ -11,6 +11,22 @@ let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
 
+function describe(error: unknown): string {
+  if (error instanceof Error) return error.stack ?? error.message
+  return String(error)
+}
+
+// Electron ignores unhandled rejections by default, so a `throw` inside an
+// async handler would vanish. These make every escaped error visible and fatal.
+function fatal(context: string, error: unknown): never {
+  dialog.showErrorBox(`Scratch Pad: ${context}`, describe(error))
+  app.exit(1)
+  throw error
+}
+
+process.on('uncaughtException', (error) => fatal('uncaught exception', error))
+process.on('unhandledRejection', (reason) => fatal('unhandled rejection', reason))
+
 // Prototype keeps its data inside the project, not in the user profile.
 // Production would use app.getPath('userData').
 function notePath(): string {
@@ -53,6 +69,9 @@ function enqueueWrite(content: string): Promise<void> {
     () => writeNoteAtomic(content),
     () => writeNoteAtomic(content)
   )
+  // `run` carries any failure to the caller, and through ipcMain.handle to the
+  // renderer. This catch only keeps a past failure from rejecting the next
+  // write's chain; it is not where the error goes to die.
   writeTail = run.catch(() => undefined)
   return run
 }
@@ -79,7 +98,7 @@ function createWindow(): void {
   mainWindow.on('close', (event) => {
     if (isQuitting) return
     event.preventDefault()
-    void hideWindow()
+    hideWindow().catch((error) => fatal('hide on close', error))
   })
 
   mainWindow.on('closed', () => {
@@ -87,14 +106,22 @@ function createWindow(): void {
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+    shell.openExternal(details.url).catch((error) => fatal('open external link', error))
     return { action: 'deny' }
   })
 
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    fatal('renderer process gone', new Error(details.reason))
+  })
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow
+      .loadURL(process.env['ELECTRON_RENDERER_URL'])
+      .catch((error) => fatal('load renderer URL', error))
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow
+      .loadFile(join(__dirname, '../renderer/index.html'))
+      .catch((error) => fatal('load renderer file', error))
   }
 }
 
@@ -164,7 +191,7 @@ function toggleWindow(): void {
   const win = liveWindow()
   if (!win) return
   if (win.isVisible() && win.isFocused()) {
-    void hideWindow()
+    hideWindow().catch((error) => fatal('hide window', error))
   } else {
     showWindow()
   }
@@ -189,33 +216,35 @@ function createTray(): void {
   tray.on('click', () => toggleWindow())
 }
 
-app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+app
+  .whenReady()
+  .then(() => {
+    electronApp.setAppUserModelId('com.electron')
 
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+    app.on('browser-window-created', (_, window) => {
+      optimizer.watchWindowShortcuts(window)
+    })
 
-  ipcMain.handle('note:read', () => readNote())
-  ipcMain.handle('note:write', (_event, content: string) => enqueueWrite(content))
+    ipcMain.handle('note:read', () => readNote())
+    ipcMain.handle('note:write', (_event, content: string) => enqueueWrite(content))
 
-  createWindow()
-  createTray()
+    createWindow()
+    createTray()
 
-  if (!globalShortcut.register(TOGGLE_ACCELERATOR, toggleWindow)) {
-    dialog.showErrorBox(
-      'Shortcut unavailable',
-      `${TOGGLE_ACCELERATOR} is already claimed by another application. ` +
-        'Use the tray icon to show the window.'
-    )
-  } else {
+    // A scratchpad you cannot summon is not this app. Refusing to start beats
+    // running in a state where the core interaction silently does nothing.
+    if (!globalShortcut.register(TOGGLE_ACCELERATOR, toggleWindow)) {
+      throw new Error(
+        `Global shortcut ${TOGGLE_ACCELERATOR} is already registered by another application.`
+      )
+    }
     console.log(`Global shortcut registered: ${TOGGLE_ACCELERATOR}`)
-  }
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    app.on('activate', function () {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
   })
-})
+  .catch((error) => fatal('startup', error))
 
 app.on('before-quit', () => {
   isQuitting = true

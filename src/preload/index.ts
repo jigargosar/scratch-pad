@@ -22,12 +22,11 @@ const api = {
 }
 
 if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
-  } catch (error) {
-    console.error(error)
-  }
+  // No try/catch: if the bridge cannot be installed the renderer has no way to
+  // read or save notes, and hiding that behind a logged error would leave a
+  // window that looks fine and silently loses everything typed into it.
+  contextBridge.exposeInMainWorld('electron', electronAPI)
+  contextBridge.exposeInMainWorld('api', api)
 } else {
   // @ts-ignore (define in dts)
   window.electron = electronAPI
