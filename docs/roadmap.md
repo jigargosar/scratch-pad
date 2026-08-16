@@ -8,7 +8,7 @@ Prototype. Global hotkey, tray, one markdown note, vim, autosave. Blocks and tab
 
 1. Add Tailwind: renderer styling currently lives in hand-written CSS in `src/renderer/src/assets/main.css`.
 
-2. Set up a proper testing framework and environment: no test runner is installed and no test has ever run. Vitest for unit work, Playwright `_electron` for driving the real app.
+2. Set up a proper testing framework and environment: no test runner is installed and no test has ever run. Vitest for unit work, Playwright `_electron` for driving the real app. Three things stay manual and cannot be automated — the global hotkey while another app holds focus, focus returning to the previous window after a hide, and tray show/quit. Do not spend time trying to automate them.
 
 3. Verify the app runs: the simplification rewrite is committed but was never launched. Main now owns the debounce and writes synchronously; the flush handshake and the write queue were deleted. None of that has been executed once. To check, run `pnpm dev`, type a few characters, then read `.data/scratch.md` and confirm the debounce and the synchronous write actually landed.
 
@@ -44,3 +44,16 @@ Heynote like sections.
 each section partially acts like a file
 code/markdown parser support
 search
+
+## Fluff
+
+Loose context from earlier sessions. Not decisions, just things that cost time to work out again.
+
+- V0/V1 split: V0 is the global hotkey plus autosave. V1 adds tabs, vim, title derived from the first line, and backup rotation.
+- Block semantics: a block gets its own language and its own line numbers. It does not get its own undo history or its own save. Undo stays document-scoped across the whole file.
+- Heynote's separator format is `∞∞∞markdown` — three U+221E characters followed by a language name, with an `-a` suffix meaning the language was auto-detected. Recalled, not verified against their repo.
+- Electron rather than Tauri, because Tauri needs the Rust toolchain and this is a prototype.
+- pnpm, never npm. The scaffold shipped `npm run` inside its own scripts and those were replaced.
+- Tailwind was deliberately skipped at the start: one full-bleed editor has no chrome to style. It is now next step 1.
+- The tree came from `pnpm create @quick-start/electron`, react-ts template. To rerun it safely: scaffold into an empty sibling directory, move its contents into the repo, then `rmdir` the sibling — if that succeeds, the move was complete.
+- Electron creates `AppData/Roaming/scratch-pad/` on every run for its own caches, no matter where notes live. Seeing it does not mean notes are leaking out of `.data/`.
