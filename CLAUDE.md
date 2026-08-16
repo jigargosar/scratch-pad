@@ -17,7 +17,7 @@ Deliberately ambitious. Not all of it ships soon.
 
 ## Facts
 
-- The app has never been launched since the simplification rewrite.
+- The app has never been launched since the simplification rewrite. To check it by hand: `pnpm dev`, type a few characters, then read `.data/scratch.md`.
 - No test runner is installed and no test has ever run.
 
 Current state, next steps, features and non-obvious facts live in `docs/roadmap.md`.

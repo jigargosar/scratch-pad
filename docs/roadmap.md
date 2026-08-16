@@ -10,7 +10,7 @@ Prototype. Global hotkey, tray, one markdown note, vim, autosave. Blocks and tab
 
 2. Set up a proper testing framework and environment: no test runner is installed and no test has ever run. Vitest for unit work, Playwright `_electron` for driving the real app.
 
-3. Verify the app runs: the simplification rewrite is committed but was never launched. Main now owns the debounce and writes synchronously; the flush handshake and the write queue were deleted. None of that has been executed once.
+3. Verify the app runs: the simplification rewrite is committed but was never launched. Main now owns the debounce and writes synchronously; the flush handshake and the write queue were deleted. None of that has been executed once. To check, run `pnpm dev`, type a few characters, then read `.data/scratch.md` and confirm the debounce and the synchronous write actually landed.
 
 4. Extract storage and test it: move the file I/O out of `src/main/index.ts` into `src/main/noteStore.ts`, taking a path argument so it runs without Electron. Cover with vitest — a missing file returns empty, any other read error throws, the atomic rename leaves no `.tmp` behind, and flushing writes the last content.
 
