@@ -1,0 +1,65 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Cascadia Code', Consolas, monospace;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-host {
+  flex: 1;
+  min-height: 0;
+}
+
+.cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+.cm-scroller {
+  font-family: inherit;
+}
+
+.save-error {
+  flex: none;
+  padding: 6px 12px;
+  background: #5a1d1d;
+  color: #ffd7d7;
+  font-size: 13px;
+}
+
+.fatal {
+  padding: 24px;
+  overflow: auto;
+}
+
+.fatal h1 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+
+.fatal pre {
+  white-space: pre-wrap;
+  background: #2a2a2a;
+  padding: 12px;
+  border-left: 3px solid #a33;
+}

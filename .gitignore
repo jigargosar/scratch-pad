@@ -1,0 +1,16 @@
+node_modules
+dist
+out
+.DS_Store
+.eslintcache
+*.log*
+
+# prototype note storage
+.data/
+
+# IDE config
+.vscode/
+.idea/
+*.iml
+.fleet/
+*.code-workspace

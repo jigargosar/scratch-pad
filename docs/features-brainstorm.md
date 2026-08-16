@@ -12,3 +12,4 @@ Heynote like sections.
 each section partially acts like a file
 code/markdown parser support
 search
+tailwind
