@@ -23,7 +23,16 @@ body {
   flex-direction: column;
 }
 
-.app {
-  flex: 1;
-  min-height: 0;
+/* CodeMirror sizes itself from its host, which has no intrinsic height. */
+.cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+.cm-scroller {
+  font-family: inherit;
 }
