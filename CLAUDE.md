@@ -8,17 +8,14 @@ This is the next iteration: the earlier prototype was stripped back to scaffoldi
 ## Protype scope
 - [x] multi tab interface.
 - [x] add new tab
-- [x] global hot key activation.
+- [x] global hot key activation, `Ctrl+Alt+Space`, toggles show and hide.
 - [x] all changes preserved
 - [x] vim bindings.
-
-## Also shipped
-
-- One file per tab under `.data/`, named by tab id.
-- Saves are debounced 500ms in main, written temp file then rename.
-- Tray icon with Show and Quit. Close hides, only the tray quits.
-- Tab labels come from the first non blank line.
-- Each tab keeps its own editor state, so switching keeps cursor and undo.
+- [x] one file per tab under `.data/`, named by tab id.
+- [x] saves debounced 500ms in main, written temp file then rename.
+- [x] tray icon with Show and Quit. Close hides, only the tray quits.
+- [x] tab labels from the first non blank line.
+- [x] each tab keeps its own editor state, so switching keeps cursor and undo.
 
 ## Tech stack
 
