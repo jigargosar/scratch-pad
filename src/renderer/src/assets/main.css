@@ -21,45 +21,7 @@ body {
   flex-direction: column;
 }
 
-.editor-host {
+.app {
   flex: 1;
   min-height: 0;
-}
-
-.cm-editor {
-  height: 100%;
-  font-size: 14px;
-}
-
-.cm-editor.cm-focused {
-  outline: none;
-}
-
-.cm-scroller {
-  font-family: inherit;
-}
-
-.save-error {
-  flex: none;
-  padding: 6px 12px;
-  background: #5a1d1d;
-  color: #ffd7d7;
-  font-size: 13px;
-}
-
-.fatal {
-  padding: 24px;
-  overflow: auto;
-}
-
-.fatal h1 {
-  font-size: 18px;
-  margin: 0 0 12px;
-}
-
-.fatal pre {
-  white-space: pre-wrap;
-  background: #2a2a2a;
-  padding: 12px;
-  border-left: 3px solid #a33;
 }
