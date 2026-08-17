@@ -3,6 +3,8 @@
 Ambitious Project for quick and permenant capture anything from anywhere. No loss data gurantee. 
 
 
+This is the next iteration: the earlier prototype was stripped back to scaffolding and is being rebuilt from scratch.
+
 ## Protype scope
 - multi tab interface.
 - add new tab
