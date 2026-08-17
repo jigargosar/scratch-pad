@@ -9,3 +9,13 @@ Ambitious Project for quick and permenant capture anything from anywhere. No los
 - global hot key activation.
 - all changes preserved
 - vim bindings.
+
+## Tech stack
+
+- Electron desktop app, packaged with electron-builder.
+- electron-vite (Vite) for dev and build.
+- React + TypeScript in the renderer.
+- CodeMirror as the editor, with `@codemirror/lang-markdown` and `@replit/codemirror-vim` for vim bindings.
+- pnpm for package management.
+- ESLint + Prettier via `@electron-toolkit` configs.
+- Typecheck is split: `tsconfig.node.json` (main/preload) and `tsconfig.web.json` (renderer); `pnpm typecheck` runs both.
