@@ -6,11 +6,19 @@ Ambitious Project for quick and permenant capture anything from anywhere. No los
 This is the next iteration: the earlier prototype was stripped back to scaffolding and is being rebuilt from scratch.
 
 ## Protype scope
-- multi tab interface.
-- add new tab
-- global hot key activation.
-- all changes preserved
-- vim bindings.
+- [x] multi tab interface.
+- [x] add new tab
+- [x] global hot key activation.
+- [x] all changes preserved
+- [x] vim bindings.
+
+## Also shipped
+
+- One file per tab under `.data/`, named by tab id.
+- Saves are debounced 500ms in main, written temp file then rename.
+- Tray icon with Show and Quit. Close hides, only the tray quits.
+- Tab labels come from the first non blank line.
+- Each tab keeps its own editor state, so switching keeps cursor and undo.
 
 ## Tech stack
 
