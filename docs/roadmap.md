@@ -26,13 +26,7 @@ New items are appended to the end of their section.
 
 ## Done
 
-- Multi tab interface.
-- Add new tab.
-- Global hotkey `Ctrl+Alt+Space`, toggles show and hide.
-- All changes preserved.
-- Vim bindings.
-- One file per tab under `.data/`, named by tab id.
-- Saves debounced 500ms in main, written temp file then rename.
-- Tray icon with Show and Quit. Close hides, only the tray quits.
-- Tab labels from the first non blank line.
-- Each tab keeps its own editor state, so switching keeps cursor and undo.
+- Tabs: multi tab interface, add tab, labels from the first non blank line, per tab editor state so switching keeps cursor and undo.
+- Persistence: one file per tab under `.data/` named by tab id, saved 500ms debounced in main via temp file then rename.
+- Editor: CodeMirror markdown with vim bindings.
+- Shell: global hotkey `Ctrl+Alt+Space` toggles show and hide, tray with Show and Quit, close hides and only the tray quits.
